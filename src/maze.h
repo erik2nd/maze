@@ -20,6 +20,7 @@ void generate_maze(int row, int col, char* path);
 void check_bottom_walls(int* set_array, int* walls_array, int size);
 int find_max_number(int* array, int size);
 void fill_empty_cells(int* array, int size);
+void union_sets(int* array, int size, int current, int next);
 void write_maze_to_file(const char* path, int** right_walls, int** bottom_walls,
                         int rows, int cols);
 

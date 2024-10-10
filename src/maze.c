@@ -1,5 +1,7 @@
 #include "maze.h"
 
+#include "maze_frontend.h"
+
 void generate_maze(int rows, int cols, char *path) {
   int **maze = (int **)calloc(rows, sizeof(double *));
   for (int i = 0; i < rows; i++) {
@@ -32,7 +34,7 @@ void generate_maze(int rows, int cols, char *path) {
       else if (rand() % 2)
         right_walls[i][j] = WALL;
       else
-        maze[i][j + 1] = maze[i][j];
+        union_sets(maze[i], cols, maze[i][j], maze[i][j + 1]);
     }
     // creating bottom walls
     for (int j = 0; j < cols; j++) {
@@ -47,16 +49,36 @@ void generate_maze(int rows, int cols, char *path) {
         if (bottom_walls[i][j]) maze[i + 1][j] = 0;
       }
     } else {
-      for (int i = 0; i < cols; i++) {
-        bottom_walls[rows - 1][i] = WALL;
-      }
       for (int j = 0; j < cols; j++) {
-        if (maze[i][j] != maze[i][j + 1]) right_walls[i][j] = 0;
+        bottom_walls[i][j] = WALL;
+      }
+      for (int j = 0; j < cols - 1; j++) {
+        if (maze[i][j] != maze[i][j + 1]) {
+          right_walls[i][j] = 0;
+          union_sets(maze[i], cols, maze[i][j], maze[i][j + 1]);
+        }
       }
     }
   }
 
   write_maze_to_file(path, right_walls, bottom_walls, rows, cols);
+
+  init_ncurses();
+  start_color();
+  init_colorpairs();
+  atexit(cleanup);
+
+  while (1) {
+    attron(COLOR_PAIR(CYAN_FONT));
+    draw_maze(right_walls, bottom_walls, rows, cols);
+    attroff(COLOR_PAIR(CYAN_FONT));
+    refresh();
+
+    int ch = getch();
+    if (ch == 'q') {
+      break;
+    }
+  }
 
   if (maze) {
     for (int i = 0; i < rows; i++) {
@@ -137,6 +159,14 @@ void fill_empty_cells(int *array, int size) {
     if (!array[i]) {
       array[i] = next;
       next++;
+    }
+  }
+}
+
+void union_sets(int *array, int size, int current, int next) {
+  for (int i = 0; i < size; i++) {
+    if (array[i] == next) {
+      array[i] = current;
     }
   }
 }

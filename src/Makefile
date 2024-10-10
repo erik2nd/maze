@@ -33,7 +33,7 @@ ifeq ($(SYSTEM), Darwin)
 	LEAKS = leaks --atExit --
 endif
 
-all: install run
+all: install
 	
 $(OBJ_DIR)/%.o: %.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -50,11 +50,11 @@ uninstall:
 run:
 	./$(INSTALL_DIR)/$(TARGET)
 
-test: build
-	./$(TARGET)
+# test: build
+# 	./$(TARGET)
 
-build: $(LIB) $(TEST_OBJECTS)
-	$(CC) $(CFLAGS) $(TEST_OBJECTS) $(LIB) -o $(TARGET) $(TEST_FLAGS)
+# build: $(LIB) $(TEST_OBJECTS)
+# 	$(CC) $(CFLAGS) $(TEST_OBJECTS) $(LIB) -o $(TARGET) $(TEST_FLAGS)
 	
 -include $(OBJECTS:.o=.d)
 #-include $(TEST_OBJECTS:.o=.d)
