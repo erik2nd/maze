@@ -44,7 +44,7 @@ void generate_maze(int rows, int cols, char *path) {
     check_bottom_walls(maze[i], bottom_walls[i], cols);
 
     if (i != rows - 1) {
-      memcpy(maze[i], maze[i + 1], cols * sizeof(int));
+      memcpy(maze[i + 1], maze[i], cols * sizeof(int));
       for (int j = 0; j < cols; j++) {
         if (bottom_walls[i][j]) maze[i + 1][j] = 0;
       }

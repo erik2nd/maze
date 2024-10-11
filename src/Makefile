@@ -83,12 +83,15 @@ gcov_report:
 	rm -f *.gcno *.gcda *.info *.gcov *.out
 	open ./report/index.html
 
-clean:
+clean: clean_ds
 	@rm -f *.o *.a *.out *.gcno *.gcda $(TARGET)
 	@rm -rf report $(OBJ_DIR) $(INSTALL_DIR)
 	
 clean_obj:
 	@rm -rf $(OBJ_DIR)
+	
+clean_ds:
+	@cd .. && find . -name ".DS_Store" -type f -delete
 
 rebuild: clean all
 
