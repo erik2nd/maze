@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "maze.h"
+#include "maze_solving.h"
+#include "cave.h"
 
 // Структура для хранения флагов
 typedef struct {
@@ -162,7 +164,28 @@ int main(int argc, char *argv[]) {
          flags.learning_flag ? learning_file : "не указан");
   printf("Output file: %s\n", flags.output_flag ? output_file : "не указан");
 
-  generate_maze(width, height, flags.output_flag ? output_file : SAVE_PATH);
+    if (flags.maze_flag) {
+        if (maze_file) {
+            if (flags.start_flag || flags.end_flag) {
+                
+            }
+            else {
+                
+            }
+        }
+        else {
+            if (flags.start_flag || flags.end_flag) {
+                generate_maze(width, height, flags.output_flag ? output_file : SAVE_PATH);
+                solve_maze(flags.output_flag ? output_file : SAVE_PATH, start_x, start_y, end_x, end_y);
+            }
+            else {
+                generate_maze(width, height, flags.output_flag ? output_file : SAVE_PATH);
+            }
+        }
+    }
+    if (flags.cave_flag) {
+        generate_cave(cave_file, birth, death);
+    }
 
   // Освобождение памяти
   if (maze_file) free(maze_file);

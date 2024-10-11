@@ -1,104 +1,79 @@
 #include "maze.h"
 
-#include "maze_frontend.h"
+#include "frontend.h"
 
 void generate_maze(int rows, int cols, char *path) {
-  int **maze = (int **)calloc(rows, sizeof(double *));
-  for (int i = 0; i < rows; i++) {
-    maze[i] = (int *)calloc(cols, sizeof(double));
-  }
-
-  int **right_walls = (int **)calloc(rows, sizeof(double *));
-  for (int i = 0; i < rows; i++) {
-    right_walls[i] = (int *)calloc(cols, sizeof(double));
-  }
-
-  int **bottom_walls = (int **)calloc(rows, sizeof(double *));
-  for (int i = 0; i < rows; i++) {
-    bottom_walls[i] = (int *)calloc(cols, sizeof(double));
-  }
+  int **maze = create_matrix(rows, cols);
+  int **right_walls = create_matrix(rows, cols);
+  int **bottom_walls = create_matrix(rows, cols);
 
   srand(time(NULL));
 
   for (int i = 0; i < rows; i++) {
-    right_walls[i][cols - 1] = WALL;
-  }
-
-  for (int i = 0; i < rows; i++) {
     fill_empty_cells(maze[i], cols);
-
-    // creating right walls
-    for (int j = 0; j < cols - 1; j++) {
-      if (maze[i][j] == maze[i][j + 1])
-        right_walls[i][j] = WALL;
-      else if (rand() % 2)
-        right_walls[i][j] = WALL;
-      else
-        union_sets(maze[i], cols, maze[i][j], maze[i][j + 1]);
-    }
-    // creating bottom walls
-    for (int j = 0; j < cols; j++) {
-      if (rand() % 2) bottom_walls[i][j] = WALL;
-    }
-
-    check_bottom_walls(maze[i], bottom_walls[i], cols);
-
-    if (i != rows - 1) {
-      memcpy(maze[i + 1], maze[i], cols * sizeof(int));
-      for (int j = 0; j < cols; j++) {
-        if (bottom_walls[i][j]) maze[i + 1][j] = 0;
-      }
-    } else {
-      for (int j = 0; j < cols; j++) {
-        bottom_walls[i][j] = WALL;
-      }
-      for (int j = 0; j < cols - 1; j++) {
-        if (maze[i][j] != maze[i][j + 1]) {
-          right_walls[i][j] = 0;
-          union_sets(maze[i], cols, maze[i][j], maze[i][j + 1]);
-        }
-      }
-    }
+    create_right_walls(maze, right_walls, i, cols);
+    create_bottom_walls(maze, bottom_walls, i, cols);
+    handle_row(maze, right_walls, bottom_walls, i, rows, cols);
   }
 
   write_maze_to_file(path, right_walls, bottom_walls, rows, cols);
 
-  init_ncurses();
-  start_color();
-  init_colorpairs();
-  atexit(cleanup);
+//  init_ncurses();
+//  start_color();
+//  init_colorpairs();
+//  atexit(cleanup);
+//
+//  while (1) {
+//    draw_maze(right_walls, bottom_walls, rows, cols);
+//    refresh();
+//
+//    int ch = getch();
+//    if (ch == 'q') {
+//      break;
+//    }
+//  }
 
-  while (1) {
-    attron(COLOR_PAIR(CYAN_FONT));
-    draw_maze(right_walls, bottom_walls, rows, cols);
-    attroff(COLOR_PAIR(CYAN_FONT));
-    refresh();
+  free_matrix(maze, rows);
+  free_matrix(right_walls, rows);
+  free_matrix(bottom_walls, rows);
+}
 
-    int ch = getch();
-    if (ch == 'q') {
-      break;
-    }
+void create_right_walls(int **maze, int **right_walls, int row, int size) {
+  for (int j = 0; j < size - 1; j++) {
+    if (maze[row][j] == maze[row][j + 1])
+      right_walls[row][j] = WALL;
+    else if (rand() % 2)
+      right_walls[row][j] = WALL;
+    else
+      union_sets(maze[row], size, maze[row][j], maze[row][j + 1]);
   }
+  right_walls[row][size - 1] = WALL;
+}
 
-  if (maze) {
-    for (int i = 0; i < rows; i++) {
-      free(maze[i]);
-    }
-    free(maze);
+void create_bottom_walls(int **maze, int **bottom_walls, int row, int size) {
+  for (int j = 0; j < size; j++) {
+    if (rand() % 2) bottom_walls[row][j] = WALL;
   }
+  check_bottom_walls(maze[row], bottom_walls[row], size);
+}
 
-  if (right_walls) {
-    for (int i = 0; i < rows; i++) {
-      free(right_walls[i]);
+void handle_row(int **maze, int **right_walls, int **bottom_walls, int i,
+                int rows, int cols) {
+  if (i != rows - 1) {
+    memcpy(maze[i + 1], maze[i], cols * sizeof(int));
+    for (int j = 0; j < cols; j++) {
+      if (bottom_walls[i][j]) maze[i + 1][j] = 0;
     }
-    free(right_walls);
-  }
-
-  if (bottom_walls) {
-    for (int i = 0; i < rows; i++) {
-      free(bottom_walls[i]);
+  } else {
+    for (int j = 0; j < cols; j++) {
+      bottom_walls[i][j] = WALL;
     }
-    free(bottom_walls);
+    for (int j = 0; j < cols - 1; j++) {
+      if (maze[i][j] != maze[i][j + 1]) {
+        right_walls[i][j] = 0;
+        union_sets(maze[i], cols, maze[i][j], maze[i][j + 1]);
+      }
+    }
   }
 }
 
@@ -199,4 +174,50 @@ void write_maze_to_file(const char *path, int **right_walls, int **bottom_walls,
 
   fclose(file);
   printf("Maze successfully written to file %s\n", path);
+}
+
+void read_maze_from_file(const char *path, int ***right_walls, int ***bottom_walls, int *rows, int *cols) {
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+        printf("Error opening file %s\n", path);
+        return;
+    }
+
+    if (fscanf(file, "%d %d", rows, cols) != 2) {
+        printf("Error reading maze dimensions from file %s\n", path);
+        fclose(file);
+        return;
+    }
+
+    *right_walls = create_matrix(*rows, *cols);
+    *bottom_walls = create_matrix(*rows, *cols);
+
+    for (int i = 0; i < *rows; i++) {
+        for (int j = 0; j < *cols; j++) {
+            if (fscanf(file, "%d", &(*right_walls)[i][j]) != 1) {
+                printf("Error reading right_walls from file %s\n", path);
+                fclose(file);
+                free_matrix(*right_walls, *rows);
+                free_matrix(*bottom_walls, *rows);
+                return;
+            }
+        }
+    }
+
+    fscanf(file, "\n");
+
+    for (int i = 0; i < *rows; i++) {
+        for (int j = 0; j < *cols; j++) {
+            if (fscanf(file, "%d", &(*bottom_walls)[i][j]) != 1) {
+                printf("Error reading bottom_walls from file %s\n", path);
+                fclose(file);
+                free_matrix(*right_walls, *rows);
+                free_matrix(*bottom_walls, *rows);
+                return;
+            }
+        }
+    }
+
+    fclose(file);
+    printf("Maze successfully read from file %s\n", path);
 }
