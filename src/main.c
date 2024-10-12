@@ -5,6 +5,7 @@
 #include "maze.h"
 #include "maze_solving.h"
 #include "cave.h"
+#include "maze_learning.h"
 
 // Структура для хранения флагов
 typedef struct {
@@ -167,7 +168,7 @@ int main(int argc, char *argv[]) {
     if (flags.maze_flag) {
         if (maze_file) {
             if (flags.start_flag || flags.end_flag) {
-                
+                solve_maze(maze_file, start_x, start_y, end_x, end_y);
             }
             else {
                 
@@ -185,6 +186,40 @@ int main(int argc, char *argv[]) {
     }
     if (flags.cave_flag) {
         generate_cave(cave_file, birth, death);
+    }
+    if (flags.learning_flag) {
+        int **right_walls = NULL;
+        int **bottom_walls = NULL;
+        int rows = 0, cols = 0;
+        
+        read_maze_from_file(learning_file, &right_walls, &bottom_walls, &rows, &cols);
+        
+        double** Q = (double**)calloc(rows * cols, sizeof(double*));
+          if (Q == NULL) {
+              fprintf(stderr, "Ошибка выделения памяти\n");
+              return 1;
+          }
+
+          for (int i = 0; i < rows * cols; ++i) {
+              Q[i] = (double*)calloc(ACTIONS, sizeof(double));
+              if (Q[i] == NULL) {
+                  fprintf(stderr, "Ошибка выделения памяти\n");
+                  return 1;
+              }
+          }
+        
+        int start_state = state_to_index(start_x, start_y, cols);
+        int end_state = state_to_index(end_x, end_y, cols);
+        
+        q_learning(start_state, end_state, Q, right_walls, bottom_walls, rows, cols);
+        
+        for (int i = 0; i < rows * cols; ++i) {
+             free(Q[i]);
+         }
+         free(Q);
+        
+        free_matrix(right_walls, rows);
+        free_matrix(bottom_walls, rows);
     }
 
   // Освобождение памяти
