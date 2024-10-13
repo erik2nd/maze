@@ -1,7 +1,5 @@
 #include "maze.h"
 
-#include "frontend.h"
-
 void generate_maze(int rows, int cols, char *path) {
   int **maze = create_matrix(rows, cols);
   int **right_walls = create_matrix(rows, cols);
@@ -18,20 +16,20 @@ void generate_maze(int rows, int cols, char *path) {
 
   write_maze_to_file(path, right_walls, bottom_walls, rows, cols);
 
-//  init_ncurses();
-//  start_color();
-//  init_colorpairs();
-//  atexit(cleanup);
-//
-//  while (1) {
-//    draw_maze(right_walls, bottom_walls, rows, cols);
-//    refresh();
-//
-//    int ch = getch();
-//    if (ch == 'q') {
-//      break;
-//    }
-//  }
+  //  init_ncurses();
+  //  start_color();
+  //  init_colorpairs();
+  //  atexit(cleanup);
+  //
+  //  while (1) {
+  //    draw_maze(right_walls, bottom_walls, rows, cols);
+  //    refresh();
+  //
+  //    int ch = getch();
+  //    if (ch == 'q') {
+  //      break;
+  //    }
+  //  }
 
   free_matrix(maze, rows);
   free_matrix(right_walls, rows);
@@ -176,48 +174,49 @@ void write_maze_to_file(const char *path, int **right_walls, int **bottom_walls,
   printf("Maze successfully written to file %s\n", path);
 }
 
-void read_maze_from_file(const char *path, int ***right_walls, int ***bottom_walls, int *rows, int *cols) {
-    FILE *file = fopen(path, "r");
-    if (file == NULL) {
-        printf("Error opening file %s\n", path);
-        return;
-    }
+void read_maze_from_file(const char *path, int ***right_walls,
+                         int ***bottom_walls, int *rows, int *cols) {
+  FILE *file = fopen(path, "r");
+  if (file == NULL) {
+    printf("Error opening file %s\n", path);
+    return;
+  }
 
-    if (fscanf(file, "%d %d", rows, cols) != 2) {
-        printf("Error reading maze dimensions from file %s\n", path);
-        fclose(file);
-        return;
-    }
-
-    *right_walls = create_matrix(*rows, *cols);
-    *bottom_walls = create_matrix(*rows, *cols);
-
-    for (int i = 0; i < *rows; i++) {
-        for (int j = 0; j < *cols; j++) {
-            if (fscanf(file, "%d", &(*right_walls)[i][j]) != 1) {
-                printf("Error reading right_walls from file %s\n", path);
-                fclose(file);
-                free_matrix(*right_walls, *rows);
-                free_matrix(*bottom_walls, *rows);
-                return;
-            }
-        }
-    }
-
-    fscanf(file, "\n");
-
-    for (int i = 0; i < *rows; i++) {
-        for (int j = 0; j < *cols; j++) {
-            if (fscanf(file, "%d", &(*bottom_walls)[i][j]) != 1) {
-                printf("Error reading bottom_walls from file %s\n", path);
-                fclose(file);
-                free_matrix(*right_walls, *rows);
-                free_matrix(*bottom_walls, *rows);
-                return;
-            }
-        }
-    }
-
+  if (fscanf(file, "%d %d", rows, cols) != 2) {
+    printf("Error reading maze dimensions from file %s\n", path);
     fclose(file);
-    printf("Maze successfully read from file %s\n", path);
+    return;
+  }
+
+  *right_walls = create_matrix(*rows, *cols);
+  *bottom_walls = create_matrix(*rows, *cols);
+
+  for (int i = 0; i < *rows; i++) {
+    for (int j = 0; j < *cols; j++) {
+      if (fscanf(file, "%d", &(*right_walls)[i][j]) != 1) {
+        printf("Error reading right_walls from file %s\n", path);
+        fclose(file);
+        free_matrix(*right_walls, *rows);
+        free_matrix(*bottom_walls, *rows);
+        return;
+      }
+    }
+  }
+
+  fscanf(file, "\n");
+
+  for (int i = 0; i < *rows; i++) {
+    for (int j = 0; j < *cols; j++) {
+      if (fscanf(file, "%d", &(*bottom_walls)[i][j]) != 1) {
+        printf("Error reading bottom_walls from file %s\n", path);
+        fclose(file);
+        free_matrix(*right_walls, *rows);
+        free_matrix(*bottom_walls, *rows);
+        return;
+      }
+    }
+  }
+
+  fclose(file);
+  printf("Maze successfully read from file %s\n", path);
 }

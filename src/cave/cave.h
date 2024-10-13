@@ -3,9 +3,8 @@
 
 #include <unistd.h>
 
-#include "common.h"
-
-#include "frontend.h"
+#include "../common/common.h"
+#include "../gui/frontend.h"
 
 #define DEAD 0
 #define ALIVE 1

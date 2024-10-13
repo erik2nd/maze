@@ -7,6 +7,8 @@
 #include <string.h>
 #include <time.h>
 
+#include "../gui/frontend.h"
+
 #define SAVE_PATH "generated_maze.txt"
 
 #define WALL 1
@@ -27,6 +29,7 @@ void fill_empty_cells(int* array, int size);
 void union_sets(int* array, int size, int current, int next);
 void write_maze_to_file(const char* path, int** right_walls, int** bottom_walls,
                         int rows, int cols);
-void read_maze_from_file(const char *path, int ***right_walls, int ***bottom_walls, int *rows, int *cols);
+void read_maze_from_file(const char* path, int*** right_walls,
+                         int*** bottom_walls, int* rows, int* cols);
 
 #endif

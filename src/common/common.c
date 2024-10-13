@@ -21,24 +21,24 @@ int **create_matrix(int rows, int cols) {
 }
 
 void copy_matrix(int **src, int **dst, int rows, int cols) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            dst[i][j] = src[i][j];
-        }
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      dst[i][j] = src[i][j];
     }
+  }
 }
 
 int compare_matrices(int **first, int **second, int rows, int cols) {
-    int res = 1;
-    for (int i = 0; i < rows && res; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (first[i][j] != second[i][j]) {
-                res = 0;
-                break;
-            }
-        }
+  int res = 1;
+  for (int i = 0; i < rows && res; i++) {
+    for (int j = 0; j < cols; j++) {
+      if (first[i][j] != second[i][j]) {
+        res = 0;
+        break;
+      }
     }
-    return res;
+  }
+  return res;
 }
 
 void free_matrix(int **matrix, int size) {

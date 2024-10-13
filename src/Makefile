@@ -6,15 +6,19 @@ LIB_FLAGS = -lncurses
 
 OBJ_DIR = obj
 INSTALL_DIR = build
-DIST_DIR = maze
+SRC_DIRS = maze cave gui common .
+OBJ_SUBDIRS = $(foreach dir, $(SRC_DIRS), $(OBJ_DIR)/$(dir))
 TEST_DIR = tests
+DIST_DIR = maze cave gui common tests
 
-SOURCES = $(wildcard *.c)
+SOURCES = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
 TESTS = $(wildcard $(TEST_DIR)/*.c)
 OBJECTS = $(patsubst %.c, $(OBJ_DIR)/%.o, $(SOURCES))
+DEPENDS = $(patsubst %.c, $(OBJ_DIR)/%.d, $(SOURCES))
 TEST_OBJECTS = $(patsubst $(TEST_DIR)/%.c, $(OBJ_DIR)/%.o, $(TESTS))
 
-TARGET = maze
+TARGET = program
+TEST_TARGET = maze_test
 
 CLANG = clang-format -i
 
@@ -38,8 +42,10 @@ all: install
 $(OBJ_DIR)/%.o: %.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/%.o: $(TEST_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+-include $(DEPENDS)
+
+$(OBJ_DIR)/%.d: %.c | $(OBJ_DIR)
+	@$(CC) $(CFLAGS) -MM -MT $(@:.d=.o) $< > $@
 
 install: uninstall $(OBJECTS) | $(INSTALL_DIR)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(INSTALL_DIR)/$(TARGET) $(LIB_FLAGS)
@@ -56,23 +62,15 @@ run:
 # build: $(LIB) $(TEST_OBJECTS)
 # 	$(CC) $(CFLAGS) $(TEST_OBJECTS) $(LIB) -o $(TARGET) $(TEST_FLAGS)
 	
--include $(OBJECTS:.o=.d)
-#-include $(TEST_OBJECTS:.o=.d)
-
-$(OBJ_DIR)/%.d: %.cc | $(OBJ_DIR)
-	@$(CC) $(CFLAGS) -MM -MT $(@:.d=.o) $< > $@
-
-#$(OBJ_DIR)/%.d: $(TEST_DIR)/%.cc | $(OBJ_DIR)
-#	@$(CC) $(CFLAGS) -MM -MT $(@:.d=.o) $< > $@
-	
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(OBJ_SUBDIRS)
 
 $(INSTALL_DIR):
 	@mkdir -p $(INSTALL_DIR)
 
-#fsan: CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined -fsanitize=unreachable
-#fsan: test
+fsan: CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined -fsanitize=unreachable
+fsan: test
 
 gcov_report:
 	$(CC) $(GCOV_FLAGS) $(TESTS) $(SOURCES_LIB) -o report.out $(TEST_FLAGS) $(LIB_FLAGS)
@@ -84,7 +82,7 @@ gcov_report:
 	open ./report/index.html
 
 clean: clean_ds
-	@rm -f *.o *.a *.out *.gcno *.gcda $(TARGET)
+	@rm -f *.o *.a *.out *.gcno *.gcda $(TARGET) $(TEST_TARGET)
 	@rm -rf report $(OBJ_DIR) $(INSTALL_DIR)
 	
 clean_obj:
@@ -96,7 +94,7 @@ clean_ds:
 rebuild: clean all
 
 clang:
-	$(CLANG) $(SOURCES) $(TESTS) *.h
+	$(CLANG) */*.c *.c */*.h 
 
 leaks: install
 	$(LEAKS) ./$(TARGET)

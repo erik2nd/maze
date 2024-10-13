@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    text-align: center;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+.control-group {
+    margin-bottom: 10px;
+}
+
+canvas {
+    border: 1px solid #000;
+    background-color: #fff;
+    width: 500px;
+    height: 500px;
+}

@@ -3,7 +3,7 @@
 
 #include <ncurses.h>
 
-#include "common.h"
+#include "../common/common.h"
 
 #define BLACK 0
 #define BLUE 1
@@ -25,9 +25,11 @@ void init_ncurses();
 void cleanup();
 
 void draw_maze(int** right_walls, int** bottom_walls, int rows, int cols);
-void draw_maze_solution(int** right_walls, int** bottom_walls, bool solution_path[MAX_ROWS][MAX_COLS], int rows, int cols);
+void draw_maze_solution(int** right_walls, int** bottom_walls,
+                        bool solution_path[MAX_ROWS][MAX_COLS], int rows,
+                        int cols);
 
-void draw_cave(int **cave, int rows, int cols);
+void draw_cave(int** cave, int rows, int cols);
 
 void init_colorpairs();
 short curs_color(int color);
