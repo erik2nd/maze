@@ -176,15 +176,15 @@ int main(int argc, char *argv[]) {
   if (flags.maze_flag) {
     if (maze_file) {
       if (flags.start_flag || flags.end_flag) {
-        solve_maze(maze_file, start_x, start_y, end_x, end_y);
+        solve_maze(maze_file, start_y, start_x, end_y, end_x);
       } else {
       }
     } else {
       if (flags.start_flag || flags.end_flag) {
         generate_maze(height, width,
                       flags.output_flag ? output_file : SAVE_PATH);
-        solve_maze(flags.output_flag ? output_file : SAVE_PATH, start_x,
-                   start_y, end_x, end_y);
+        solve_maze(flags.output_flag ? output_file : SAVE_PATH, start_y,
+                   start_x, end_y, end_x);
       } else {
         generate_maze(height, width,
                       flags.output_flag ? output_file : SAVE_PATH);

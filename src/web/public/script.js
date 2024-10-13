@@ -99,16 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const endX = parseInt(endXInput.value);
         const endY = parseInt(endYInput.value);
 
-        const response = await fetch('/solveMaze', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ startX, startY, endX, endY })
-        });
+        if (startX <= mazeWidth || startY <= mazeHeight || endX <= mazeWidth || endY <= mazeHeight) {
+            const response = await fetch('/solveMaze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ startX, startY, endX, endY })
+            });
 
-        const { rightWalls, bottomWalls, solution } = await response.json();
-        drawMaze(rightWalls, bottomWalls, solution);
+            const { rightWalls, bottomWalls, solution } = await response.json();
+            drawMaze(rightWalls, bottomWalls, solution);
+        }
     }
 
     function parseMazeData(data) {
