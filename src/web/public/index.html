@@ -3,39 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лабиринт</title>
+    <title>Maze</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Maze</h1>
-        <canvas id="mazeCanvas" width="500" height="500"></canvas>
-        <div class="controls">
-            <!-- Группа 1: Загрузка файла -->
-            <div class="control-group">
-                <label for="file">Loading:</label>
-                <input type="file" id="file">
-                <button id="loadMaze">Load</button>
+        <div class="main-content-container">
+            <div class="header-container">
+                <h1>Maze</h1>
             </div>
-            <!-- Группа 2: Генерация лабиринта -->
-            <div class="control-group">
-                <label for="width">Width:</label>
-                <input type="number" id="width" min="1" max="50" value="10">
-                <label for="height">Height:</label>
-                <input type="number" id="height" min="1" max="50" value="10">
-                <button id="generateMaze">Generate</button>
-            </div>
-            <!-- Группа 3: Решение лабиринта -->
-            <div class="control-group">
-                <label for="startX">Start X:</label>
-                <input type="number" id="startX" min="1" max="50" value="1">
-                <label for="startY">Start Y:</label>
-                <input type="number" id="startY" min="1" max="50" value="1">
-                <label for="endX">End X:</label>
-                <input type="number" id="endX" min="1" max="50" value="9">
-                <label for="endY">End Y:</label>
-                <input type="number" id="endY" min="1" max="50" value="9">
-                <button id="solveMaze">Solve</button>
+            <div class="main-content">
+                <canvas id="mazeCanvas" width="500" height="500"></canvas>
+                <div class="controls">
+                    <div class="control-group">
+                        <h2>Loading</h2>
+                        <div class="input-group">
+                            <label for="file-input-button">File:</label>
+                            <button id="file-input-button">Choose file</button>
+                            <input type="file" id="file" style="display: none;">
+                        </div>
+                        <button id="loadMaze">Load</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h2>Generating</h2>
+                        <div class="input-group">
+                            <label for="width">Width:</label>
+                            <input type="number" id="width" min="1" max="50" value="10">
+                        </div>
+                        <div class="input-group">
+                            <label for="height">Height:</label>
+                            <input type="number" id="height" min="1" max="50" value="10">
+                        </div>
+                        <button id="generateMaze">Generate</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h2>Solving</h2>
+                        <div class="input-group">
+                            <label for="startX">Start X:</label>
+                            <input type="number" id="startX" min="1" max="50" value="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="startY">Start Y:</label>
+                            <input type="number" id="startY" min="1" max="50" value="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="endX">End X:</label>
+                            <input type="number" id="endX" min="1" max="50" value="10">
+                        </div>
+                        <div class="input-group">
+                            <label for="endY">End Y:</label>
+                            <input type="number" id="endY" min="1" max="50" value="10">
+                        </div>
+                        <button id="solveMaze">Solve</button>
+                    </div>                    
+                </div>
             </div>
         </div>
     </div>

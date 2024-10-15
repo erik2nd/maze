@@ -43,7 +43,7 @@ int take_action(int state, int action, int size) {
 int choose_action(int state, double **Q) {
   int res = 0;
   if ((double)rand() / RAND_MAX < EPSILON) {
-    res = rand() % ACTIONS;  // Random action
+    res = rand() % ACTIONS;
   } else {
     int best_action = 0;
     for (int a = 1; a < ACTIONS; a++) {
@@ -58,13 +58,16 @@ int choose_action(int state, double **Q) {
 
 void q_learning(int start_state, int goal_state, double **Q, int **right_walls,
                 int **bottom_walls, int rows, int cols) {
+    int count = 0;
   for (int episode = 0; episode < EPISODES; episode++) {
+      printf("%d\n", count++);
     int state = start_state;
     while (state != goal_state) {
       int action = choose_action(state, Q);
       if (!is_valid_action(state, action, right_walls, bottom_walls, rows,
                            cols))
         continue;
+      printf("() -> ");
       int next_state = take_action(state, action, cols);
       double reward = (next_state == goal_state) ? 100.0 : -1.0;
       double max_next_q = Q[next_state][0];
@@ -78,39 +81,47 @@ void q_learning(int start_state, int goal_state, double **Q, int **right_walls,
       state = next_state;
     }
   }
-  print_path(Q, cols, start_state, goal_state);
 }
 
-// void learn_agent() {
-//     srand(time(NULL));
-//
-//    // Initialize walls (example)
-//    for (int i = 0; i < ROWS; i++) {
-//        for (int j = 0; j < COLS; j++) {
-//            right_walls[i][j] = 0;
-//            bottom_walls[i][j] = 0;
-//        }
-//    }
-//    right_walls[0][0] = 1; // Example wall
-//    bottom_walls[1][1] = 1; // Example wall
-//
-//    // Initialize Q-table
-//    for (int i = 0; i < ROWS * COLS; i++) {
-//        for (int j = 0; j < ACTIONS; j++) {
-//            Q[i][j] = 0.0;
-//        }
-//    }
-//
-//    q_learning();
-//    print_path();
-// }
+ void learn_agent(int** right_walls, int** bottom_walls, int rows, int cols, bool solution[MAX_ROWS][MAX_COLS], int start_x, int start_y, int end_x, int end_y) {
 
-void print_path(double **Q, int size, int start_state, int goal_state) {
+     double **Q = (double **)calloc(rows * cols, sizeof(double *));
+     if (Q == NULL) {
+       fprintf(stderr, "Memory allocation error\n");
+       return;
+     }
+     for (int i = 0; i < rows * cols; ++i) {
+       Q[i] = (double *)calloc(ACTIONS, sizeof(double));
+       if (Q[i] == NULL) {
+         fprintf(stderr, "Memory allocation error\n");
+         return;
+       }
+     }
+
+     int start_state = state_to_index(start_x, start_y, cols);
+     int end_state = state_to_index(end_x, end_y, cols);
+
+     q_learning(start_state, end_state, Q, right_walls, bottom_walls, rows,
+                cols);
+     
+     printf("() -> ");
+     write_solution(Q, cols, start_state, end_state, solution);
+
+     for (int i = 0; i < rows * cols; i++) {
+       free(Q[i]);
+     }
+     free(Q);
+ }
+
+void write_solution(double **Q, int size, int start_state, int goal_state, bool solution[MAX_ROWS][MAX_COLS]) {
+    solution[1][1] = true;
+//    printf("() -> ");
   int state = start_state;
   while (state != goal_state) {
     int row = 0, col = 0;
     index_to_state(state, &row, &col, size);
-    printf("(%d, %d) -> ", row, col);
+//      solution[row][col] = true;
+      printf("(%d, %d) -> ", row, col);
     int best_action = 0;
     for (int a = 1; a < ACTIONS; a++) {
       if (Q[state][a] > Q[state][best_action]) {
@@ -121,5 +132,6 @@ void print_path(double **Q, int size, int start_state, int goal_state) {
   }
   int row, col;
   index_to_state(goal_state, &row, &col, size);
-  printf("(%d, %d)\n", row, col);
+//    solution[row][col] = true;
+    printf("(%d, %d)\n", row, col);
 }

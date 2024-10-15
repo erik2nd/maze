@@ -4,10 +4,7 @@
 #include <stdbool.h>
 
 #include "../common/common.h"
-#include "../gui/frontend.h"
 #include "../maze/maze.h"
-
-#define SOLUTION_PATH "maze_solution.txt"
 
 typedef struct {
   int row;
@@ -33,8 +30,10 @@ int bfs(int **right_walls, int **bottom_walls, int start_row, int start_col,
 void mark_solution_path(Point prev[MAX_ROWS][MAX_COLS],
                         bool solution_path[MAX_ROWS][MAX_COLS], int start_row,
                         int start_col, int end_row, int end_col);
-void printMazeWithSolution(bool solutionPath[MAX_ROWS][MAX_COLS], int rows,
-                           int cols);
-void write_maze_solution_to_file(const char *path, bool solution[MAX_ROWS][MAX_COLS], int rows, int cols);
+void write_maze_solution_to_file(const char *path,
+                                 bool solution[MAX_ROWS][MAX_COLS], int rows,
+                                 int cols);
+void read_maze_solution_from_file(const char *path,
+                                  bool solution[MAX_ROWS][MAX_COLS]);
 
 #endif

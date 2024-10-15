@@ -12,19 +12,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const endXInput = document.getElementById('endX');
     const endYInput = document.getElementById('endY');
 
-    let mazeWidth, mazeHeight, cellSize;
+    canvas.width = 500;
+    canvas.height = 500;
+
+    let mazeWidth, mazeHeight;
+
+    const directions = [
+        { dx: 1, dy: 0 }, // Right
+        { dx: -1, dy: 0 }, // Left
+        { dx: 0, dy: 1 }, // Down
+        { dx: 0, dy: -1 } // Up
+    ];
 
     function drawMaze(rightWalls, bottomWalls, solution = []) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-        // Calculate cell size based on the smaller dimension
         const cellWidth = (canvas.width - 2 * (mazeWidth - 1)) / mazeWidth;
         const cellHeight = (canvas.height - 2 * (mazeHeight - 1)) / mazeHeight;
 
-        // const cellSize = Math.min(cellWidth, cellHeight);
-    
-        // Set wall thickness
-        // ctx.lineWidth = 2;
+        ctx.strokeStyle = 'white';
+        ctx.fillStyle = 'white';
+        ctx.lineWidth = 2;
+
+        ctx.lineJoin = 'square'; 
+        ctx.lineCap = 'square'; 
+
+        ctx.imageSmoothingEnabled = false;
     
         for (let y = 0; y < mazeHeight; y++) {
             for (let x = 0; x < mazeWidth; x++) {
@@ -34,8 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Draw right wall
                 if (rightWalls[y][x]) {
                     ctx.beginPath();
-                    ctx.moveTo(cellX + cellWidth + 1, cellY);
-                    ctx.lineTo(cellX + cellWidth + 1, cellY + cellHeight);
+                    ctx.moveTo(cellX + cellWidth + 2, cellY);
+                    ctx.lineTo(cellX + cellWidth + 2, cellY + cellHeight);
                     ctx.stroke();
                 }
     
@@ -43,18 +56,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (bottomWalls[y][x]) {
                     ctx.beginPath();
                     ctx.moveTo(cellX, cellY + cellHeight + 1);
-                    ctx.lineTo(cellX + cellWidth, cellY + cellHeight + 1);
+                    ctx.lineTo(cellX + cellWidth + 1, cellY + cellHeight + 1);
                     ctx.stroke();
                 }
     
                 // Draw solution path
-                if (solution.length > 0) {
-                    if (solution[y][x] === 1) {
-                        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-                        ctx.beginPath();
-                        ctx.arc(cellX + cellWidth / 2, cellY + cellHeight / 2, 5, 0, 2 * Math.PI);
-                        ctx.fill();
-                    }
+                if (solution.length > 0 && solution[y][x] === 1) {
+                    ctx.fillStyle = 'rgba(163, 40, 56)';
+                    ctx.beginPath();
+                    ctx.arc(cellX + cellWidth / 2, cellY + cellHeight / 2, Math.min(cellWidth, cellHeight) / 10, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    directions.forEach(dir => {
+                        const nx = x + dir.dx;
+                        const ny = y + dir.dy;
+        
+                        if (nx >= 0 && nx < mazeWidth && ny >= 0 && ny < mazeHeight && solution[ny][nx] === 1) {
+                            if ((dir.dx === 1 && !rightWalls[y][x]) || (dir.dx === -1 && !rightWalls[ny][nx]) ||
+                                (dir.dy === 1 && !bottomWalls[y][x]) || (dir.dy === -1 && !bottomWalls[ny][nx])) {
+                                ctx.strokeStyle = 'rgba(163, 40, 56)';
+                                ctx.lineWidth = 2;
+                                ctx.beginPath();
+                                ctx.moveTo(cellX + cellWidth / 2, cellY + cellHeight / 2);
+                                ctx.lineTo(cellX + cellWidth / 2 + dir.dx * (cellWidth / 2), cellY + cellHeight / 2 + dir.dy * (cellHeight / 2));
+                                ctx.stroke();
+                            }
+                        }
+                    });  
+                    
+                    ctx.strokeStyle = 'white';
+                    ctx.fillStyle = 'white';
                 }
             }
         }
@@ -99,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const endX = parseInt(endXInput.value);
         const endY = parseInt(endYInput.value);
 
-        if (startX <= mazeWidth || startY <= mazeHeight || endX <= mazeWidth || endY <= mazeHeight) {
+        if (startX <= mazeWidth && startY <= mazeHeight && endX <= mazeWidth && endY <= mazeHeight) {
             const response = await fetch('/solveMaze', {
                 method: 'POST',
                 headers: {
@@ -115,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function parseMazeData(data) {
         const lines = data.trim().split('\n');
-        const [width, height] = lines[0].split(' ').map(Number);
+        const [height, width] = lines[0].split(' ').map(Number);
         const rightWalls = [];
         const bottomWalls = [];
 
@@ -136,4 +167,14 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMazeButton.addEventListener('click', loadMaze);
     generateMazeButton.addEventListener('click', generateMaze);
     solveMazeButton.addEventListener('click', solveMaze);
+
+    document.getElementById('file-input-button').addEventListener('click', function() {
+        document.getElementById('file').click();
+    });
+
+    document.getElementById('file').addEventListener('change', function(event) {
+        const fileInput = event.target;
+        const fileName = fileInput.files[0] ? fileInput.files[0].name : 'Choose file';
+        document.getElementById('file-input-button').textContent = fileName;
+    });
 });

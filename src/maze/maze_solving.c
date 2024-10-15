@@ -40,22 +40,7 @@ void solve_maze(char *path, int start_row, int start_col, int end_row,
   if (shortest_path != -1) {
     mark_solution_path(prev, solution_path, start_row, start_col, end_row,
                        end_col);
-    write_maze_solution_to_file(SOLUTION_PATH, solution_path, rows, cols);
-    //            printMazeWithSolution(solution_path, rows, cols);
-//    init_ncurses();
-//    start_color();
-//    init_colorpairs();
-//    atexit(cleanup);
-//
-//    while (1) {
-//      draw_maze_solution(right_walls, bottom_walls, solution_path, rows, cols);
-//      refresh();
-//
-//      int ch = getch();
-//      if (ch == 'q') {
-//        break;
-//      }
-//    }
+    write_maze_solution_to_file(MAZE_SOLUTION, solution_path, rows, cols);
   } else {
     printf("No path found\n");
   }
@@ -134,21 +119,9 @@ void mark_solution_path(Point prev[MAX_ROWS][MAX_COLS],
   solution_path[end_row][end_col] = true;
 }
 
-void printMazeWithSolution(bool solutionPath[MAX_ROWS][MAX_COLS], int rows,
-                           int cols) {
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      if (solutionPath[i][j]) {
-        printf("* ");
-      } else {
-        printf(". ");
-      }
-    }
-    printf("\n");
-  }
-}
-
-void write_maze_solution_to_file(const char *path, bool solution[MAX_ROWS][MAX_COLS], int rows, int cols) {
+void write_maze_solution_to_file(const char *path,
+                                 bool solution[MAX_ROWS][MAX_COLS], int rows,
+                                 int cols) {
   FILE *file = fopen(path, "w");
   if (file == NULL) {
     printf("Error opening file %s\n", path);
@@ -159,12 +132,52 @@ void write_maze_solution_to_file(const char *path, bool solution[MAX_ROWS][MAX_C
 
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      if (solution[i][j]) fprintf(file, "1 ");
-      else fprintf(file, "0 ");
+      if (solution[i][j])
+        fprintf(file, "1 ");
+      else
+        fprintf(file, "0 ");
     }
     fprintf(file, "\n");
   }
 
   fclose(file);
   printf("Maze solution successfully written to file %s\n", path);
+}
+
+void read_maze_solution_from_file(const char *path,
+                                  bool solution[MAX_ROWS][MAX_COLS]) {
+  FILE *file = fopen(path, "r");
+  if (file == NULL) {
+    printf("Error opening file %s\n", path);
+    return;
+  }
+
+  int rows = 0, cols = 0;
+
+  if (fscanf(file, "%d %d", &rows, &cols) != 2) {
+    printf("Error reading maze dimensions from file %s\n", path);
+    fclose(file);
+    return;
+  }
+
+  if (rows > MAX_ROWS || cols > MAX_COLS || rows < 0 || cols < 0) {
+    printf("Wrong maze dimensions\n");
+    fclose(file);
+    return;
+  }
+
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      int value;
+      if (fscanf(file, "%d", &value) != 1) {
+        printf("Error reading maze solution from file %s\n", path);
+        fclose(file);
+        return;
+      }
+      solution[i][j] = (value != 0);
+    }
+  }
+
+  fclose(file);
+  printf("Maze solution successfully read from file %s\n", path);
 }

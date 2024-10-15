@@ -14,7 +14,7 @@ const SOLUTION_FILE = 'maze_solution.txt';
 
 app.post('/generateMaze', (req, res) => {
     const { width, height } = req.body;
-    exec(`../build/program -m -f ${MAZE_FILE} -w ${width} -h ${height}`, (error, stdout, stderr) => {
+    exec(`../build/program -m -o ${MAZE_FILE} -w ${width} -h ${height} -q`, (error, stdout, stderr) => {
         if (error) {
             res.status(500).send(error.message);
             return;
@@ -27,7 +27,7 @@ app.post('/generateMaze', (req, res) => {
 
 app.post('/solveMaze', (req, res) => {
     const { startX, startY, endX, endY } = req.body;
-    exec(`../build/program -m ${MAZE_FILE} -s ${startX} ${startY} -e ${endX} ${endY}`, (error, stdout, stderr) => {
+    exec(`../build/program -m ${MAZE_FILE} -s ${startX} ${startY} -e ${endX} ${endY} -q`, (error, stdout, stderr) => {
         if (error) {
             res.status(500).send(error.message);
             return;

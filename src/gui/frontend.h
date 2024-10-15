@@ -21,8 +21,14 @@
 #define MAGENTA_FONT 12
 #define YELLOW_FONT 13
 
+void init_render();
 void init_ncurses();
 void cleanup();
+
+void render_maze(int** right_walls, int** bottom_walls, int rows, int cols);
+void render_maze_solution(int** right_walls, int** bottom_walls,
+                          bool solution_path[MAX_ROWS][MAX_COLS], int rows,
+                          int cols);
 
 void draw_maze(int** right_walls, int** bottom_walls, int rows, int cols);
 void draw_maze_solution(int** right_walls, int** bottom_walls,

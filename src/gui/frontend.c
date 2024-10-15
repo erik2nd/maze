@@ -1,9 +1,16 @@
 #include "frontend.h"
 
+void init_render() {
+  init_ncurses();
+  start_color();
+  init_colorpairs();
+  atexit(cleanup);
+}
+
 void init_ncurses() {
   initscr();
   noecho();
-  timeout(0);
+  cbreak();
   curs_set(0);
   keypad(stdscr, TRUE);
 }
@@ -15,77 +22,81 @@ void cleanup() {
 }
 
 void draw_maze(int** right_walls, int** bottom_walls, int rows, int cols) {
-  attron(COLOR_PAIR(CYAN_FONT));
+  //  attron(COLOR_PAIR(CYAN_FONT));
+  int max_y, max_x;
+  getmaxyx(stdscr, max_y, max_x);
+
+  int offset_y = (max_y - rows - 1) / 2;
+  int offset_x = (max_x - cols * 2) / 2;
+
   for (int j = 1; j < cols * 2; j++) {
-    mvaddch(0, j, '_');
+    mvaddch(offset_y, offset_x + j, '_');
   }
+
   for (int i = 0; i < rows; i++) {
-    mvaddch(i + 1, 0, '|');
+    mvaddch(offset_y + i + 1, offset_x, '|');
     for (int j = 0; j < cols; j++) {
       if (right_walls[i][j]) {
         if (bottom_walls[i][j]) {
-          mvaddch(i + 1, j * 2 + 1, '_');
-          mvaddch(i + 1, j * 2 + 2, '|');
+          mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, '_');
+          mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, '|');
         } else {
-          mvaddch(i + 1, j * 2 + 1, ' ');
-          mvaddch(i + 1, j * 2 + 2, '|');
+          mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, ' ');
+          mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, '|');
         }
       } else {
         if (bottom_walls[i][j]) {
-          mvaddch(i + 1, j * 2 + 1, '_');
-          mvaddch(i + 1, j * 2 + 2, '_');
+          mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, '_');
+          mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, '_');
         } else {
-          mvaddch(i + 1, j * 2 + 1, ' ');
-          mvaddch(i + 1, j * 2 + 2, ' ');
+          mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, ' ');
+          mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, ' ');
         }
       }
     }
-    mvaddch(i + 1, cols * 2, '|');
+    mvaddch(offset_y + i + 1, offset_x + cols * 2, '|');
   }
-  attroff(COLOR_PAIR(CYAN_FONT));
+  //  attroff(COLOR_PAIR(CYAN_FONT));
 }
 
 void draw_maze_solution(int** right_walls, int** bottom_walls,
                         bool solution_path[MAX_ROWS][MAX_COLS], int rows,
                         int cols) {
+  int max_y, max_x;
+  getmaxyx(stdscr, max_y, max_x);
+
+  int offset_y = (max_y - rows - 1) / 2;
+  int offset_x = (max_x - cols * 2) / 2;
+
   for (int j = 1; j < cols * 2; j++) {
-    mvaddch(0, j, '_');
+    mvaddch(offset_y, offset_x + j, '_');
   }
+
   for (int i = 0; i < rows; i++) {
-    mvaddch(i + 1, 0, '|');
+    mvaddch(offset_y + i + 1, offset_x, '|');
     for (int j = 0; j < cols; j++) {
       if (right_walls[i][j]) {
         if (bottom_walls[i][j]) {
           if (solution_path[i][j]) {
             attron(COLOR_PAIR(GREEN_FONT));
             attron(A_UNDERLINE);
-            mvaddch(i + 1, j * 2 + 1, '*');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, '*');
             attroff(A_UNDERLINE);
             attroff(COLOR_PAIR(GREEN_FONT));
-
-            //                attron(COLOR_PAIR(CYAN_FONT));
-            mvaddch(i + 1, j * 2 + 2, '|');
-            //                attroff(COLOR_PAIR(CYAN_FONT));
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, '|');
           } else {
-            //                attron(COLOR_PAIR(CYAN_FONT));
-            mvaddch(i + 1, j * 2 + 1, '_');
-            mvaddch(i + 1, j * 2 + 2, '|');
-            //                attroff(COLOR_PAIR(CYAN_FONT));
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, '_');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, '|');
           }
         } else {
           if (solution_path[i][j]) {
             attron(COLOR_PAIR(GREEN_FONT));
-            mvaddch(i + 1, j * 2 + 1, '*');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, '*');
             attroff(COLOR_PAIR(GREEN_FONT));
-
-            //                attron(COLOR_PAIR(CYAN_FONT));
-            mvaddch(i + 1, j * 2 + 2, '|');
-            //                attroff(COLOR_PAIR(CYAN_FONT));
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, '|');
           } else {
-            //                attron(COLOR_PAIR(CYAN_FONT));
-            mvaddch(i + 1, j * 2 + 1, ' ');
-            mvaddch(i + 1, j * 2 + 2, '|');
-            //                attroff(COLOR_PAIR(CYAN_FONT));
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, ' ');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, '|');
           }
         }
       } else {
@@ -93,32 +104,28 @@ void draw_maze_solution(int** right_walls, int** bottom_walls,
           if (solution_path[i][j]) {
             attron(COLOR_PAIR(GREEN_FONT));
             attron(A_UNDERLINE);
-            mvaddch(i + 1, j * 2 + 1, '*');
-            mvaddch(i + 1, j * 2 + 2, ' ');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, '*');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, ' ');
             attroff(A_UNDERLINE);
             attroff(COLOR_PAIR(GREEN_FONT));
           } else {
-            //                attron(COLOR_PAIR(CYAN_FONT));
-            mvaddch(i + 1, j * 2 + 1, '_');
-            mvaddch(i + 1, j * 2 + 2, '_');
-            //                attroff(COLOR_PAIR(CYAN_FONT));
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, '_');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, '_');
           }
         } else {
           if (solution_path[i][j]) {
             attron(COLOR_PAIR(GREEN_FONT));
-            mvaddch(i + 1, j * 2 + 1, '*');
-            mvaddch(i + 1, j * 2 + 2, ' ');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, '*');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, ' ');
             attroff(COLOR_PAIR(GREEN_FONT));
           } else {
-            //                attron(COLOR_PAIR(CYAN_FONT));
-            mvaddch(i + 1, j * 2 + 1, ' ');
-            mvaddch(i + 1, j * 2 + 2, ' ');
-            //                attroff(COLOR_PAIR(CYAN_FONT));
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 1, ' ');
+            mvaddch(offset_y + i + 1, offset_x + j * 2 + 2, ' ');
           }
         }
       }
     }
-    mvaddch(i + 1, cols * 2, '|');
+    mvaddch(offset_y + i + 1, offset_x + cols * 2, '|');
   }
 }
 
@@ -132,6 +139,22 @@ void draw_cave(int** cave, int rows, int cols) {
     }
   }
   attroff(COLOR_PAIR(RED));
+}
+
+void render_maze(int** right_walls, int** bottom_walls, int rows, int cols) {
+  init_render();
+  draw_maze(right_walls, bottom_walls, rows, cols);
+  refresh();
+  getch();
+}
+
+void render_maze_solution(int** right_walls, int** bottom_walls,
+                          bool solution_path[MAX_ROWS][MAX_COLS], int rows,
+                          int cols) {
+  init_render();
+  draw_maze_solution(right_walls, bottom_walls, solution_path, rows, cols);
+  refresh();
+  getch();
 }
 
 void init_colorpairs() {

@@ -16,21 +16,6 @@ void generate_maze(int rows, int cols, char *path) {
 
   write_maze_to_file(path, right_walls, bottom_walls, rows, cols);
 
-  //  init_ncurses();
-  //  start_color();
-  //  init_colorpairs();
-  //  atexit(cleanup);
-  //
-  //  while (1) {
-  //    draw_maze(right_walls, bottom_walls, rows, cols);
-  //    refresh();
-  //
-  //    int ch = getch();
-  //    if (ch == 'q') {
-  //      break;
-  //    }
-  //  }
-
   free_matrix(maze, rows);
   free_matrix(right_walls, rows);
   free_matrix(bottom_walls, rows);
@@ -184,6 +169,12 @@ void read_maze_from_file(const char *path, int ***right_walls,
 
   if (fscanf(file, "%d %d", rows, cols) != 2) {
     printf("Error reading maze dimensions from file %s\n", path);
+    fclose(file);
+    return;
+  }
+
+  if (*rows > MAX_ROWS || *cols > MAX_COLS || *rows < 0 || *cols < 0) {
+    printf("Wrong maze dimensions\n");
     fclose(file);
     return;
   }

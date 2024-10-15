@@ -6,7 +6,7 @@ LIB_FLAGS = -lncurses
 
 OBJ_DIR = obj
 INSTALL_DIR = build
-SRC_DIRS = maze cave gui common .
+SRC_DIRS = maze cave gui common io .
 OBJ_SUBDIRS = $(foreach dir, $(SRC_DIRS), $(OBJ_DIR)/$(dir))
 TEST_DIR = tests
 DIST_DIR = maze cave gui common tests
