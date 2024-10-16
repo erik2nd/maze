@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c11 -Wall -Wextra -Werror -pedantic
+CFLAGS = -std=c11 -Wall -Wextra -Werror -pedantic -g
 GCOV_FLAGS = -fprofile-arcs -ftest-coverage -lgcov
 TEST_FLAGS = -lcheck
 LIB_FLAGS = -lncurses

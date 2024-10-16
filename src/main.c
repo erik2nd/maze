@@ -77,21 +77,20 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-  }
-  else if (flags.cave_flag) {
+  } else if (flags.cave_flag) {
     generate_cave(args.cave_file, args.birth, args.death);
-  }
-  else if (flags.learning_flag) {
+  } else if (flags.learning_flag) {
     read_maze_from_file(args.learning_file, &right_walls, &bottom_walls, &rows,
                         &cols);
-      learn_agent(right_walls, bottom_walls, rows, cols, solution, args.start_x, args.start_y, args.end_x, args.end_y);
-      if (!flags.nonrender_flag) {
-        render_maze_solution(right_walls, bottom_walls, solution, rows, cols);
-      }
+    learn_agent(right_walls, bottom_walls, rows, cols, solution, args.start_x,
+                args.start_y, args.end_x, args.end_y);
+    if (!flags.nonrender_flag) {
+      render_maze_solution(right_walls, bottom_walls, solution, rows, cols);
+    }
   }
 
-    free_matrix(right_walls, rows);
-    free_matrix(bottom_walls, rows);
+  free_matrix(right_walls, rows);
+  free_matrix(bottom_walls, rows);
   free_args(&args);
 
   return 0;
