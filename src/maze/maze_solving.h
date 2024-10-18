@@ -1,10 +1,8 @@
 #ifndef MAZE_SOLVING_H
 #define MAZE_SOLVING_H
 
-#include <stdbool.h>
-
 #include "../common/common.h"
-#include "../maze/maze.h"
+#include "../maze/maze_generation.h"
 
 typedef struct {
   int row;
@@ -24,12 +22,14 @@ Point dequeue(Queue *q);
 
 void solve_maze(char *path, int start_row, int start_col, int end_row,
                 int end_col);
+
 int bfs(int **right_walls, int **bottom_walls, int start_row, int start_col,
         int end_row, int end_col, int rows, int cols,
         Point prev[MAX_ROWS][MAX_COLS]);
 void mark_solution_path(Point prev[MAX_ROWS][MAX_COLS],
                         bool solution_path[MAX_ROWS][MAX_COLS], int start_row,
                         int start_col, int end_row, int end_col);
+
 void write_maze_solution_to_file(const char *path,
                                  bool solution[MAX_ROWS][MAX_COLS], int rows,
                                  int cols);

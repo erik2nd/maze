@@ -32,15 +32,14 @@ void solve_maze(char *path, int start_row, int start_col, int end_row,
   read_maze_from_file(path, &right_walls, &bottom_walls, &rows, &cols);
 
   Point prev[MAX_ROWS][MAX_COLS];
-  bool solution_path[MAX_ROWS][MAX_COLS] = {false};
+  bool solution[MAX_ROWS][MAX_COLS] = {false};
 
   int shortest_path = bfs(right_walls, bottom_walls, start_row, start_col,
                           end_row, end_col, rows, cols, prev);
 
   if (shortest_path != -1) {
-    mark_solution_path(prev, solution_path, start_row, start_col, end_row,
-                       end_col);
-    write_maze_solution_to_file(MAZE_SOLUTION, solution_path, rows, cols);
+    mark_solution_path(prev, solution, start_row, start_col, end_row, end_col);
+    write_maze_solution_to_file(MAZE_SOLUTION, solution, rows, cols);
   } else {
     printf("No path found\n");
   }
@@ -179,5 +178,4 @@ void read_maze_solution_from_file(const char *path,
   }
 
   fclose(file);
-  printf("Maze solution successfully read from file %s\n", path);
 }

@@ -1,6 +1,6 @@
-#include "cave.h"
+#include "cave_generation.h"
 
-void generate_cave(const char *path, int birth, int death) {
+void generate_cave(const char *path, int birth, int death, int ms) {
   int **cave = NULL;
   int rows = 0, cols = 0;
 
@@ -9,13 +9,10 @@ void generate_cave(const char *path, int birth, int death) {
   int **cave_prev = create_matrix(rows, cols);
   copy_matrix(cave, cave_prev, rows, cols);
 
-  init_ncurses();
-  start_color();
-  init_colorpairs();
-  atexit(cleanup);
+  init_render();
 
   while (1) {
-    clear();
+    erase();
     draw_cave(cave, rows, cols);
     refresh();
 
@@ -31,22 +28,20 @@ void generate_cave(const char *path, int birth, int death) {
       }
     }
 
-    napms(1000);
+    if (ms == -1)
+      getch();
+    else {
+      napms(ms);
+    }
 
     if (compare_matrices(cave, cave_prev, rows, cols)) break;
   }
 
-  //    print_matrix(cave, rows, cols);
-  clear();
+  erase();
   draw_cave(cave, rows, cols);
+  print_cave_message(rows);
   refresh();
-
-  while (1) {
-    int ch = getch();
-    if (ch == 'q') {
-      break;
-    }
-  }
+  getch();
 
   free_matrix(cave, rows);
   free_matrix(cave_prev, rows);
@@ -96,17 +91,4 @@ void read_cave_from_file(const char *path, int ***cave, int *rows, int *cols) {
 
   fclose(file);
   printf("Cave successfully read from file %s\n", path);
-}
-
-void print_matrix(int **matrix, int rows, int cols) {
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      if (matrix[i][j] == 0) {
-        printf(".");
-      } else {
-        printf("#");
-      }
-    }
-    printf("\n");
-  }
 }

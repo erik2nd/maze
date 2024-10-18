@@ -9,6 +9,7 @@
 #define MAX_COLS 50
 
 #define MAZE_SOLUTION "maze_solution.txt"
+#define SAVE_PATH "generated_maze.txt"
 
 int **create_matrix(int rows, int cols);
 void copy_matrix(int **src, int **dst, int rows, int cols);

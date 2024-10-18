@@ -22,7 +22,6 @@ void cleanup() {
 }
 
 void draw_maze(int** right_walls, int** bottom_walls, int rows, int cols) {
-  //  attron(COLOR_PAIR(CYAN_FONT));
   int max_y, max_x;
   getmaxyx(stdscr, max_y, max_x);
 
@@ -56,7 +55,6 @@ void draw_maze(int** right_walls, int** bottom_walls, int rows, int cols) {
     }
     mvaddch(offset_y + i + 1, offset_x + cols * 2, '|');
   }
-  //  attroff(COLOR_PAIR(CYAN_FONT));
 }
 
 void draw_maze_solution(int** right_walls, int** bottom_walls,
@@ -130,15 +128,33 @@ void draw_maze_solution(int** right_walls, int** bottom_walls,
 }
 
 void draw_cave(int** cave, int rows, int cols) {
+  int max_y, max_x;
+  getmaxyx(stdscr, max_y, max_x);
+
+  int offset_y = (max_y - rows) / 2;
+  int offset_x = (max_x - cols * 2) / 2;
+
   attron(COLOR_PAIR(RED));
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      if (cave[i][j]) {
-        mvaddstr(i + 1, j * 2 + 1, "  ");
+      if (!cave[i][j]) {
+        mvaddstr(offset_y + i, offset_x + j * 2, "  ");
       }
     }
   }
   attroff(COLOR_PAIR(RED));
+}
+
+void print_cave_message(int rows) {
+  int max_y, max_x;
+  getmaxyx(stdscr, max_y, max_x);
+
+  const char* message = "This is the final state";
+
+  int offset_y = (max_y - rows) / 2;
+  int offset_x = (max_x - 23) / 2;
+
+  mvaddstr(offset_y + rows + 1, offset_x, message);
 }
 
 void render_maze(int** right_walls, int** bottom_walls, int rows, int cols) {

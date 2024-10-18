@@ -36,6 +36,7 @@ void draw_maze_solution(int** right_walls, int** bottom_walls,
                         int cols);
 
 void draw_cave(int** cave, int rows, int cols);
+void print_cave_message(int rows);
 
 void init_colorpairs();
 short curs_color(int color);

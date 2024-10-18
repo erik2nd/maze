@@ -3,7 +3,12 @@
 
 #include <string.h>
 
+#include "../cave/cave_generation.h"
 #include "../common/common.h"
+#include "../gui/frontend.h"
+#include "../maze/maze_generation.h"
+#include "../maze/maze_learning.h"
+#include "../maze/maze_solving.h"
 
 typedef struct {
   int maze_flag;
@@ -37,6 +42,12 @@ typedef struct {
 void parse_args(int argc, char **argv, Args *args, Flags *flags);
 void free_args(Args *args);
 void init_args(Args *args);
+
+void process_maze(Args args, Flags flags);
+void process_maze_generation(Args args, Flags flags);
+void process_maze_learning(Args args, Flags flags);
+void process_cave_generation(Args args, Flags flags);
+
 char *allocate_and_copy_string(const char *str);
 void print_usage(char *program_name);
 

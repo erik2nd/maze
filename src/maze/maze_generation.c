@@ -1,4 +1,4 @@
-#include "maze.h"
+#include "maze_generation.h"
 
 void generate_maze(int rows, int cols, char *path) {
   int **maze = create_matrix(rows, cols);
@@ -189,6 +189,8 @@ void read_maze_from_file(const char *path, int ***right_walls,
         fclose(file);
         free_matrix(*right_walls, *rows);
         free_matrix(*bottom_walls, *rows);
+        *right_walls = NULL;
+        *bottom_walls = NULL;
         return;
       }
     }
@@ -203,11 +205,12 @@ void read_maze_from_file(const char *path, int ***right_walls,
         fclose(file);
         free_matrix(*right_walls, *rows);
         free_matrix(*bottom_walls, *rows);
+        *right_walls = NULL;
+        *bottom_walls = NULL;
         return;
       }
     }
   }
 
   fclose(file);
-  printf("Maze successfully read from file %s\n", path);
 }
