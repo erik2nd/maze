@@ -2,7 +2,7 @@
 
 ## Installation
 
-```git clone XXX && cd A1_Maze-1/src```
+```git clone XXX && cd maze/src```
 
 ## Building
 
