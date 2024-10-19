@@ -1,10 +1,8 @@
 #include "test.h"
 
 int main() {
-  //  Suite *suite_array[] = {suite_cave_generation(), suite_maze_generation(),
-  //  suite_maze_learning(), suite_maze_solving()};
   Suite *suite_array[] = {suite_maze_generation(), suite_maze_solving(),
-                          suite_maze_learning()};
+                          suite_maze_learning(), suite_cave_generation()};
   printf("\n");
   for (unsigned long i = 0; i < sizeof(suite_array) / sizeof(suite_array[0]);
        i++) {

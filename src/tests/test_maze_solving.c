@@ -252,7 +252,7 @@ START_TEST(test_write_maze_solution_to_file_error_opening) {
   bool solution[MAX_ROWS][MAX_COLS] = {{true, false, true},
                                        {false, true, false}};
 
-  const char *path = NULL;
+  const char *path = "\0";
 
   redirect_output_to_null();
 

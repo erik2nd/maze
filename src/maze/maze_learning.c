@@ -41,18 +41,25 @@ int take_action(int state, int action, int size) {
 }
 
 int get_opposite_action(int action) {
+  int res = 0;
   switch (action) {
-    case 0:      // up
-      return 1;  // down
-    case 1:      // down
-      return 0;  // up
-    case 2:      // left
-      return 3;  // right
-    case 3:      // right
-      return 2;  // left
+    case 0:     // up
+      res = 1;  // down
+      break;
+    case 1:     // down
+      res = 0;  // up
+      break;
+    case 2:     // left
+      res = 3;  // right
+      break;
+    case 3:     // right
+      res = 2;  // left
+      break;
     default:
-      return -1;
+      res = -1;
+      break;
   }
+  return res;
 }
 
 int choose_action(int state, double **Q, double epsilon, int **right_walls,
@@ -68,21 +75,23 @@ int choose_action(int state, double **Q, double epsilon, int **right_walls,
     }
   }
 
-  if (valid_count == 0) return -1;
-
-  if ((double)rand() / RAND_MAX < epsilon) {
-    res = valid_actions[rand() % valid_count];
+  if (valid_count == 0) {
+    res = -1;
   } else {
-    int best_action = -1;
-    double best_value = -INFINITY;
-    for (int a = 0; a < ACTIONS; a++) {
-      if (is_valid_action(state, a, right_walls, bottom_walls, rows, cols) &&
-          Q[state][a] > best_value) {
-        best_action = a;
-        best_value = Q[state][a];
+    if ((double)rand() / RAND_MAX < epsilon) {
+      res = valid_actions[rand() % valid_count];
+    } else {
+      int best_action = -1;
+      double best_value = -INFINITY;
+      for (int a = 0; a < ACTIONS; a++) {
+        if (is_valid_action(state, a, right_walls, bottom_walls, rows, cols) &&
+            Q[state][a] > best_value) {
+          best_action = a;
+          best_value = Q[state][a];
+        }
       }
+      res = best_action;
     }
-    res = best_action;
   }
   return res;
 }
@@ -108,9 +117,6 @@ void q_learning(int start_state, int goal_state, double **Q, int **right_walls,
       int action = choose_action(state, Q, EPSILON, right_walls, bottom_walls,
                                  rows, cols);
       if (action == -1) break;
-      if (!is_valid_action(state, action, right_walls, bottom_walls, rows,
-                           cols))
-        continue;
 
       int next_state = take_action(state, action, cols);
       double reward = (next_state == goal_state) ? REWARD_GOAL : REWARD_STEP;
@@ -162,18 +168,7 @@ void learn_agent(int **right_walls, int **bottom_walls, int rows, int cols,
                  bool solution[MAX_ROWS][MAX_COLS], int start_x, int start_y,
                  int end_x, int end_y) {
   int total_size = rows * cols;
-  double **Q = (double **)calloc(total_size, sizeof(double *));
-  if (Q == NULL) {
-    fprintf(stderr, "Memory allocation error\n");
-    return;
-  }
-  for (int i = 0; i < total_size; i++) {
-    Q[i] = (double *)calloc(ACTIONS, sizeof(double));
-    if (Q[i] == NULL) {
-      fprintf(stderr, "Memory allocation error\n");
-      return;
-    }
-  }
+  double **Q = create_matrix_double(total_size, ACTIONS);
 
   for (int i = 0; i < total_size; i++) {
     for (int j = 0; j < ACTIONS; j++) {
@@ -186,21 +181,10 @@ void learn_agent(int **right_walls, int **bottom_walls, int rows, int cols,
 
   q_learning(start_state, end_state, Q, right_walls, bottom_walls, rows, cols);
 
-  //  for (int i = 0; i < total_size; i++) {
-  //    printf("%d | ", i);
-  //    for (int j = 0; j < ACTIONS; j++) {
-  //      printf("%f ", Q[i][j]);
-  //    }
-  //    printf("\n");
-  //  }
-
   write_solution(Q, cols, start_state, end_state, solution, right_walls,
                  bottom_walls);
 
-  for (int i = 0; i < rows * cols; i++) {
-    free(Q[i]);
-  }
-  free(Q);
+  free_matrix_double(Q, total_size);
 }
 
 void write_solution(double **Q, int size, int start_state, int goal_state,

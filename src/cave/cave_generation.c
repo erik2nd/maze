@@ -84,11 +84,11 @@ void read_cave_from_file(const char *path, int ***cave, int *rows, int *cols) {
         printf("Error reading cave from file %s\n", path);
         fclose(file);
         free_matrix(*cave, *rows);
+        *cave = NULL;
         return;
       }
     }
   }
 
   fclose(file);
-  printf("Cave successfully read from file %s\n", path);
 }

@@ -406,7 +406,7 @@ START_TEST(test_write_maze_to_file) {
 END_TEST
 
 START_TEST(test_write_maze_to_file_error_opening) {
-  const char *path = NULL;
+  const char *path = "\0";
 
   int **right_walls = NULL;
   int **bottom_walls = NULL;
