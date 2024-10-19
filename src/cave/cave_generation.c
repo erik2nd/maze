@@ -1,50 +1,18 @@
 #include "cave_generation.h"
 
-void generate_cave(const char *path, int birth, int death, int ms) {
-  int **cave = NULL;
-  int rows = 0, cols = 0;
-
-  read_cave_from_file(path, &cave, &rows, &cols);
-
-  int **cave_prev = create_matrix(rows, cols);
+void generate_cave(int **cave, int **cave_prev, int rows, int cols, int birth,
+                   int death) {
   copy_matrix(cave, cave_prev, rows, cols);
-
-  init_render();
-
-  while (1) {
-    erase();
-    draw_cave(cave, rows, cols);
-    refresh();
-
-    copy_matrix(cave, cave_prev, rows, cols);
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        int count = alive_count(cave_prev, i, j, rows, cols);
-        if (cave_prev[i][j]) {
-          if (count < death) cave[i][j] = DEAD;
-        } else {
-          if (count > birth) cave[i][j] = ALIVE;
-        }
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      int count = alive_count(cave_prev, i, j, rows, cols);
+      if (cave_prev[i][j]) {
+        if (count < death) cave[i][j] = DEAD;
+      } else {
+        if (count > birth) cave[i][j] = ALIVE;
       }
     }
-
-    if (ms == -1)
-      getch();
-    else {
-      napms(ms);
-    }
-
-    if (compare_matrices(cave, cave_prev, rows, cols)) break;
   }
-
-  erase();
-  draw_cave(cave, rows, cols);
-  print_cave_message(rows);
-  refresh();
-  getch();
-
-  free_matrix(cave, rows);
-  free_matrix(cave_prev, rows);
 }
 
 int alive_count(int **cave, int i, int j, int rows, int cols) {

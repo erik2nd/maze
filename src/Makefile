@@ -9,7 +9,7 @@ INSTALL_DIR = build
 TEST_DIR = tests
 SRC_DIRS = maze cave gui common io
 OBJ_SUBDIRS = $(foreach dir, $(SRC_DIRS), $(OBJ_DIR)/$(dir))
-DIST_DIRS = maze cave gui common tests
+DIST_DIRS = $(SRC_DIRS) tests
 
 SOURCES = $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
 SRC_OBJECTS = $(patsubst %.c, $(OBJ_DIR)/%.o, $(SOURCES))
@@ -86,7 +86,7 @@ gcov_report:
 	open ./report/index.html
 
 clean: clean_ds
-	@rm -f *.o *.a *.out *.gcno *.gcda $(TARGET) $(TEST_TARGET)
+	@rm -f *.o *.a *.out *.gcno *.gcda *.tar.gz $(TARGET) $(TEST_TARGET)
 	@rm -rf report $(OBJ_DIR) $(INSTALL_DIR)
 	@rm -f generated_maze.txt maze_solution.txt
 	

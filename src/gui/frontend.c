@@ -134,7 +134,7 @@ void draw_cave(int** cave, int rows, int cols) {
   int offset_y = (max_y - rows) / 2;
   int offset_x = (max_x - cols * 2) / 2;
 
-  attron(COLOR_PAIR(RED));
+  attron(COLOR_PAIR(CYAN));
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
       if (!cave[i][j]) {
@@ -142,7 +142,7 @@ void draw_cave(int** cave, int rows, int cols) {
       }
     }
   }
-  attroff(COLOR_PAIR(RED));
+  attroff(COLOR_PAIR(CYAN));
 }
 
 void print_cave_message(int rows) {

@@ -203,11 +203,56 @@ START_TEST(test_read_cave_from_file_error_reading_data) {
 }
 END_TEST
 
+START_TEST(test_generate_cave) {
+  int rows = 10;
+  int cols = 10;
+  int birth = 4;
+  int death = 3;
+
+  int **cave = create_matrix(rows, cols);
+  int **cave_prev = create_matrix(rows, cols);
+
+  int initial_matrix[10][10] = {
+      {1, 0, 1, 0, 0, 0, 0, 1, 1, 0}, {0, 0, 1, 1, 0, 0, 0, 0, 0, 1},
+      {0, 0, 1, 0, 1, 0, 1, 1, 0, 1}, {0, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+      {0, 0, 0, 1, 1, 0, 0, 1, 1, 1}, {0, 1, 0, 1, 0, 1, 0, 0, 0, 0},
+      {1, 1, 0, 0, 0, 0, 0, 1, 0, 0}, {0, 0, 0, 0, 0, 0, 1, 0, 1, 1},
+      {1, 0, 0, 0, 0, 1, 1, 0, 0, 0}, {0, 1, 1, 0, 0, 1, 1, 0, 0, 0}};
+
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      cave[i][j] = initial_matrix[i][j];
+    }
+  }
+
+  for (int i = 0; i < 5; i++) {
+    generate_cave(cave, cave_prev, rows, cols, birth, death);
+  }
+
+  int expected_matrix[10][10] = {
+      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+      {1, 1, 1, 1, 1, 1, 0, 0, 1, 1}, {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+      {1, 0, 0, 0, 0, 0, 0, 0, 0, 1}, {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+      {1, 1, 0, 0, 0, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      ck_assert_int_eq(cave[i][j], expected_matrix[i][j]);
+    }
+  }
+
+  free_matrix(cave, rows);
+  free_matrix(cave_prev, rows);
+}
+END_TEST
+
 Suite *suite_cave_generation() {
   Suite *s = suite_create("CAVE_GENERATION");
   TCase *tc = tcase_create("cave_generation_tc");
 
   // generate_cave
+  tcase_add_test(tc, test_generate_cave);
 
   // alive_count
   tcase_add_test(tc, test_alive_count_center);

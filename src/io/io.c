@@ -62,7 +62,9 @@ void parse_args(int argc, char **argv, Args *args, Flags *flags) {
       if (i + 2 < argc) {
         args->start_x = atoi(argv[++i]) - 1;
         args->start_y = atoi(argv[++i]) - 1;
-        if (args->start_x < 0 || args->start_y < 0) print_usage(argv[0]);
+        if (args->start_x < 0 || args->start_y < 0 ||
+            args->start_x >= MAX_COLS || args->start_y >= MAX_ROWS)
+          print_usage(argv[0]);
       } else {
         print_usage(argv[0]);
       }
@@ -71,7 +73,9 @@ void parse_args(int argc, char **argv, Args *args, Flags *flags) {
       if (i + 2 < argc) {
         args->end_x = atoi(argv[++i]) - 1;
         args->end_y = atoi(argv[++i]) - 1;
-        if (args->end_x < 0 || args->end_y < 0) print_usage(argv[0]);
+        if (args->end_x < 0 || args->end_y < 0 || args->start_x >= MAX_COLS ||
+            args->start_y >= MAX_ROWS)
+          print_usage(argv[0]);
       } else {
         print_usage(argv[0]);
       }
@@ -122,7 +126,7 @@ void parse_args(int argc, char **argv, Args *args, Flags *flags) {
       flags->milliseconds_flag = 1;
       if (i + 1 < argc) {
         args->ms = atoi(argv[++i]);
-        if (args->ms < 0) print_usage(argv[0]);
+        if (args->ms <= 0) print_usage(argv[0]);
       } else {
         print_usage(argv[0]);
       }
@@ -233,8 +237,39 @@ void process_maze_learning(Args args, Flags flags) {
 }
 
 void process_cave_generation(Args args, Flags flags) {
-  generate_cave(args.cave_file, args.birth, args.death,
-                flags.milliseconds_flag ? args.ms : -1);
+  int **cave = NULL;
+  int rows = 0, cols = 0;
+
+  read_cave_from_file(args.cave_file, &cave, &rows, &cols);
+
+  int **cave_prev = create_matrix(rows, cols);
+
+  init_render();
+
+  while (1) {
+    erase();
+    draw_cave(cave, rows, cols);
+    refresh();
+
+    generate_cave(cave, cave_prev, rows, cols, args.birth, args.death);
+
+    if (!flags.milliseconds_flag)
+      getch();
+    else {
+      napms(args.ms);
+    }
+
+    if (compare_matrices(cave, cave_prev, rows, cols)) break;
+  }
+
+  erase();
+  draw_cave(cave, rows, cols);
+  print_cave_message(rows);
+  refresh();
+  getch();
+
+  free_matrix(cave, rows);
+  free_matrix(cave_prev, rows);
 }
 
 void free_args(Args *args) {
